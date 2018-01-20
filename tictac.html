@@ -1,22 +1,41 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <!-- <title>Tic Tac Toe</title> -->
+        <title>Tic Tac Toe</title>
         <link rel="stylesheet" href="tictac.css">
+        <link href="https://fonts.googleapis.com/css?family=Just+Another+Hand" rel="stylesheet"> 
     </head>
     <body>
-<!--         <h1>Tic Tac Toe</h1>
+        <h1>
+        	Tic Tac Toe
+			<span id="difficultyText">Difficulty</span>
+        </h1>
+
+		<div class="nav">
+			<button class="difficultyBtn potato selected">Potato</button>
+			<button class="difficultyBtn grandmaster">Grandmaster</button>
+		</div>
 		<div class="container">
-			<div class="grid"></div>
-			<div class="grid vertical"></div>
-			<div class="grid"></div>
-			<div class="grid horizontal"></div>
-			<div class="grid horizontal vertical"></div>
-			<div class="grid horizontal"></div>
-			<div class="grid"></div>
-			<div class="grid vertical"></div>
-			<div class="grid"></div>
-		</div> -->
+		  <div class="row">
+		    <div id ="0" class="grid"></div>
+		    <div id ="1" class="grid vertical"></div>
+		    <div id ="2" class="grid"></div>
+		  </div>
+  		  <div class="row">
+		    <div id ="3" class="grid horizontal"></div>
+		    <div id ="4" class="grid horizontal vertical"></div>
+		    <div id ="5" class="grid horizontal"></div>
+		  </div>
+  		  <div class="row">
+		    <div id ="6" class="grid"></div>
+		    <div id ="7" class="grid vertical"></div>
+		    <div id ="8" class="grid"></div>
+		  </div>
+		</div>
+		<div class="footer">
+			<button id="reset">Reset</button>
+			<span class="victory"></span>
+		</div>
 	<script src="tictac.js"></script>
     </body>
 </html>

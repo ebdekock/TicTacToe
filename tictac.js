@@ -1,8 +1,133 @@
-var HUMAN = true
-var CPU = false
-var EMPTY = null
-var currentPlayer = CPU;
+// Get elements
+var grid = document.querySelectorAll(".grid");
+var reset = document.querySelector("#reset");
+var victory = document.querySelector(".victory");
+var difficulty= document.querySelectorAll(".difficultyBtn");
+
+// Set player and board vars
+var HUMAN = true;
+var CPU = false;
+var CPULevel = "potato";
+var EMPTY = null;
+var DRAW = -1;
+var currentPlayer = HUMAN;
 var depth = 0;
+var board = [
+    null, null, null, 
+    null, null, null, 
+    null, null, null
+    ];
+var gameOver = false;
+
+// Init
+createListeners();
+
+function createListeners(){
+    // Create grid click listeners (humans move)
+    for (var i = 0; i < grid.length; i++){
+        grid[i].addEventListener("click", function(){
+            humanTurn(this);
+        })
+    }
+
+    // Reset button
+    reset.addEventListener("click", function(){
+            resetGame();
+    })
+
+    // Difficulty
+    for (var i = 0; i < difficulty.length; i++){
+        difficulty[i].addEventListener("click", function(){
+            difficulty[0].classList.remove("selected");
+            difficulty[1].classList.remove("selected");
+            this.classList.add("selected");
+            this.textContent === "Potato" ? CPULevel = "potato": CPULevel = "grandmaster";
+        })
+    }    
+}
+
+function resetGame(){
+    // Reset vars
+    currentPlayer = HUMAN;
+    depth = 0;
+    board = [
+        null, null, null, 
+        null, null, null, 
+        null, null, null
+        ];
+    gameOver = false;
+
+    // Remove 'pieces' from board
+    for (var i = 0; i < grid.length; i++){
+        grid[i].classList.remove("human");
+        grid[i].classList.remove("cpu");
+    }
+
+    // Clear end game div
+    victory.innerHTML = ""
+    victory.classList.remove("win");
+    victory.classList.remove("loss");
+    victory.classList.remove("draw");
+}
+
+
+function humanTurn(element){
+    // Check for a winner
+    if (getWinner(board) === null) {
+        // If empty piece is clicked
+        if (!element.classList.contains("cpu") && !element.classList.contains("human")) {
+            // Make the move
+            element.classList.add("human");
+            board[Number(element.id)] = currentPlayer;
+            // Check for winner
+            if (getWinner(board) === HUMAN) {
+                victory.innerHTML = "You Win!"
+                victory.classList.add("win");
+            } else if (getWinner(board) === DRAW) {
+                victory.innerHTML = "You Draw!"
+                victory.classList.add("draw");
+            }
+            // Switch players - make CPU move
+            currentPlayer = CPU
+            cpuTurn();
+       } 
+    }
+}
+
+function cpuTurn(){
+    // Check for a winner
+    if ( getWinner(board) === null ){
+        // Make the move based on difficulty
+        var nextMove = getNextCPUMove ();
+        board[nextMove] = currentPlayer
+        grid[nextMove].classList.add("cpu");
+        // Check for winner
+        if (getWinner(board) === CPU) {
+            victory.innerHTML = "CPU Wins!"
+            victory.classList.add("loss");
+        } else if (getWinner(board) === DRAW) {
+            victory.innerHTML = "You Draw!"
+            victory.classList.add("draw");
+        }
+        // Switch players
+        currentPlayer = HUMAN
+    } 
+}
+
+function getNextCPUMove (){
+    var nextCPUMove;
+    if (CPULevel === "potato"){
+        // Get random move from available moves
+        var availableMoves = getAvailableMoves(board);
+        nextCPUMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    } else {
+        // Calculate next move using minimax algorithm
+        var bestMove = getBestMove(board, depth, currentPlayer);
+        nextCPUMove = bestMove["move"];
+    }
+
+    return nextCPUMove
+}
 
 function getBestMove(board, depth, currentPlayer)
 {
@@ -129,8 +254,7 @@ function getWinner(board)
         }
     }
     //diagonal victory \
-    if (board[0] === board[4] && board[0] === board[8])
-    {
+    if (board[0] === board[4] && board[0] === board[8]) {
         //human wins
         if (board[0] === HUMAN) {
             return HUMAN;
@@ -140,168 +264,25 @@ function getWinner(board)
             return CPU;
         }
     }
+
     //diagonal victory /
-    if (board[2] === board[4] && board[2] === board[6])
-    {
+    if (board[2] === board[4] && board[2] === board[6]) {
         //human wins
         if (board[2] === HUMAN) {
             return HUMAN;
         }
         //CPU wins
-        else if (board[2] === HUMAN) {
+        else if (board[2] === CPU) {
             return CPU;
         }
     }
-    // if game is ongoing or tie, return null
-    return null;
-}
 
-//===============================================================//
-
-
-testMini();
-
-function testMini(){
-    // test a bunch of moves...
-    var board = [
-        null, null, null, 
-        null, true, null, 
-        null, null, null
-        ];
-
-    nextMove = getBestMove(board, 0, currentPlayer);
-
-    if (nextMove["move"] === 0) {
-        console.log("Move 1 - success")
-    } else {
-        console.log("Move 1 - fail")
+    // if game is ongoing return null
+    for (var i = 0; i < board.length; i++) {
+        if (board[i] === EMPTY)
+            return null;
     }
 
-    board = [
-        false, null, null, 
-        null, true, true, 
-        null, null, null
-        ];
-
-    nextMove = getBestMove(board, 0, currentPlayer);
-
-    if (nextMove["move"] === 3) {
-        console.log("Move 2 - success")
-    } else {
-        console.log("Move 2 - fail")
-    }
-
-    board = [
-        false, null, null, 
-        false, true, true, 
-        null, null, true
-        ];
-
-    nextMove = getBestMove(board, 0, currentPlayer);
-
-    if (nextMove["move"] === 6) {
-        console.log("Move 3 - success")
-    }else {
-        console.log("Move 3 - fail")
-    }
-
-    board = [
-        null, null, null, 
-        null, null, true, 
-        null, null, null
-        ];
-
-    nextMove = getBestMove(board, 0, currentPlayer);
-
-    if (nextMove["move"] === 2) {
-        console.log("Move 4 - success")
-    }else {
-        console.log("Move 4 - fail")
-    }
-
-    board = [
-        null, null, false, 
-        null, true, true, 
-        null, null, null
-        ];
-
-    nextMove = getBestMove(board, 0, currentPlayer);
-
-    if (nextMove["move"] === 3) {
-
-        console.log("Move 5 - success")
-    }else {
-        console.log("Move 5 - fail")
-    }
-
-    board = [
-        true, null, false, 
-        false, true, true, 
-        null, null, null
-        ];
-
-    nextMove = getBestMove(board, 0, currentPlayer);
-
-    if (nextMove["move"] === 8) {
-        console.log("Move 6 - success")
-    }else {
-        console.log("Move 6 - fail")
-    }
-
-    board = [
-        true, true, false, 
-        false, true, true, 
-        null, null, false
-        ];
-
-    nextMove = getBestMove(board, 0, currentPlayer);
-
-    if (nextMove["move"] === 7) {
-        console.log("Move 7 - success")
-    }else {
-        console.log("Move 7 - fail")
-    }
-
-    board = [
-        null, null, null, 
-        null, null, null, 
-        true, null, null
-        ];
-
-    nextMove = getBestMove(board, 0, currentPlayer);
-
-    if (nextMove["move"] === 4) {
-        console.log("Move 8 - success")
-    }else {
-        console.log("Move 8 - fail")
-    }
-
-    board = [
-        null, null, null, 
-        true, false, null, 
-        true, null, null
-        ];
-
-    nextMove = getBestMove(board, 0, currentPlayer);
-
-    if (nextMove["move"] === 0) {
-        console.log("Move 9 - success")
-    }else {
-        console.log("Move 9 - fail")
-    }
-
-    board = [
-        false, null, null, 
-        true, false, null, 
-        true, true, null
-        ];
-
-    nextMove = getBestMove(board, 0, currentPlayer);
-
-    if (nextMove["move"] === 8) {
-        console.log("Move 10 - success")
-    }else {
-        console.log("Move 10 - fail")
-    }
-
+    // else draw
+    return DRAW;
 }

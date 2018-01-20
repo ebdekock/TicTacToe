@@ -1,34 +1,146 @@
+html {
+  box-sizing: border-box;
+  font-family: 'Just Another Hand', cursive;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+	background-color: #8F9C9A;
+	margin: 0;
+}
+
 h1 {
+	color: white;
+	background-color: #17332F;
+	padding-top: 30px;
+	margin: 0;
 	text-align: center;
+	text-transform: uppercase;
+	letter-spacing: 0.4em;
+	font-size: 4em;
 }
 
-.grid {
-	float: left;
-	width: 30%;
-	padding-top: 30%;
+button {
+	color: #17332F;
+	border: none;
+	background: none;
+	outline: none;
+	font-family: 'Just Another Hand', cursive;
+	text-transform: uppercase;
+	height: 100%;
+	letter-spacing: 0.15em;
+	font-size: 2em;
 }
 
-.vertical {
-	border-left: 1px solid black;
-	border-right: 1px solid black;
+button:hover {
+	color: white;
+	background-color: #17332F;;
 }
 
-.horizontal {
-	border-top: 1px solid black;
-	border-bottom: 1px solid black;
+#difficultyText {
+	display: block;
+	padding-top: 0px;
+	margin-bottom: none;
+	text-align: center;
+	letter-spacing: 0.25em;
+	font-size: 0.2em;
+	text-transform: none;
 }
 
-.playerX {
-  	background-image: url("https://vignette.wikia.nocookie.net/slayone/images/c/ce/X_sign.png/revision/latest?cb=20161112115211");
-	background-size:100%;
+.nav {
+	background-color: white;
+	height: 25px;
+	text-align: center;
+	font-size: 0;
 }
 
-.playerO{
-  	background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/O-Jolle_red.svg/540px-O-Jolle_red.svg.png");
-	background-size:100%;
+.difficultyBtn {
+	padding-top: 5px;
+	font-size: 20px;
+	letter-spacing: 0.2em;
+}
+
+.selected {
+	color: white;
+	background-color: #17332F;;
 }
 
 .container{
-	max-width: 600px;
-	margin: 0 auto;
+	padding-top: 50px;
+	max-width: 500px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.row .grid  {
+	padding-top: 30%;
+	width: 33.33333%;
+	float: left;
+	text-align: center;
+}
+
+.vertical {
+	border-left: 2px solid white;
+	border-right: 2px solid white;
+}
+
+.horizontal {
+	border-top: 2px solid white;
+	border-bottom: 2px solid white;
+}
+
+.human {
+	/*Icons made by freepik.com */
+  	background-image: url("images/human.svg");
+	background-size:100%;
+}
+
+.cpu{
+	/*Icons made by freepik.com */
+	background-image: url("images/cpu.svg");
+	background-size:100%;
+}
+
+.footer {
+	text-align: center;
+	color: black;
+	display: block;
+	height: 25px;
+	clear: both;
+}
+
+#reset {
+	color: white;
+	margin-top: 80px;
+	margin-bottom: 20px;
+}
+
+#reset:hover {
+	background-color: #8F9C9A;
+	background-image: url("images/scribble.svg");
+	background-size: 100%;
+}
+
+.victory {
+	display: block;
+}
+
+.win {
+	font-size: 7em;
+	color: green;
+}
+
+.loss {
+	font-size: 7em;
+	color: red;
+}
+
+.draw {
+	font-size: 7em;
+	color: black;
 }
