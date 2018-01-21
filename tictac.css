@@ -61,6 +61,7 @@ button:hover {
 
 .difficultyBtn {
 	padding-top: 5px;
+	padding-bottom: 5px;
 	font-size: 20px;
 	letter-spacing: 0.2em;
 }
@@ -118,6 +119,10 @@ button:hover {
 	color: white;
 	margin-top: 80px;
 	margin-bottom: 20px;
+	border: none;
+	background: none;
+	outline: none;
+	
 }
 
 #reset:hover {
@@ -131,16 +136,50 @@ button:hover {
 }
 
 .win {
-	font-size: 7em;
+	font-size: 6em;
 	color: green;
 }
 
 .loss {
-	font-size: 7em;
+	font-size: 6em;
 	color: red;
 }
 
 .draw {
-	font-size: 7em;
+	font-size: 6em;
 	color: black;
 }
+
+@media only screen and (max-width: 480px) {
+ 	h1 { 
+		font-size: 2em; 
+		padding-top: 10px;
+   }
+
+   #reset {
+		margin-top: 20px;
+		outline: none;
+	}
+
+	.container{
+		padding-top: 25px;
+	}
+}
+
+@media (hover:none), (hover:on-demand) {
+    #reset:hover {
+		border: none;
+		background: none;
+		outline: none;
+	}
+
+    #reset:focus {
+		outline: none;
+	}
+
+	button:focus {
+		outline: none;
+	}
+
+}
+
