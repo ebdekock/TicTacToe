@@ -10,7 +10,6 @@ var HUMAN = 1; // 0001
 var CPU = 2; // 0010
 var ANY_PLAYER = 3; // 0011
 var DRAW = 4; // 0100
-var ALL = 15; // 1111
 
 var CPULevel = "potato";
 var currentPlayer = HUMAN;
@@ -291,7 +290,7 @@ function getWinner(board){
 
     // If game is ongoing return.
     for (var i = 0; i < board.length; i++) {
-        if ((board[i] & ALL) === 0){
+        if ((board[i] & ANY_PLAYER) === 0){
             return EMPTY;
         }
     }
