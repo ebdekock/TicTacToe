@@ -1,41 +1,46 @@
-// Get elements
+// Get elements.
 var grid = document.querySelectorAll(".grid");
 var reset = document.querySelector("#reset");
 var victory = document.querySelector(".victory");
 var difficulty= document.querySelectorAll(".difficultyBtn");
 
-// Set player and board vars
-var HUMAN = true;
-var CPU = false;
+// Set player and board vars - bitmask flags.
+var EMPTY = 0; // 0000
+var HUMAN = 1; // 0001
+var CPU = 2; // 0010
+var ANY_PLAYER = 3; // 0011
+var DRAW = 4; // 0100
+var ALL = 15; // 1111
+
 var CPULevel = "potato";
-var EMPTY = null;
-var DRAW = -1;
 var currentPlayer = HUMAN;
+
 var depth = 0;
 var board = [
-    null, null, null, 
-    null, null, null, 
-    null, null, null
+    EMPTY, EMPTY, EMPTY, 
+    EMPTY, EMPTY, EMPTY, 
+    EMPTY, EMPTY, EMPTY
     ];
 var gameOver = false;
 
-// Init
+
+// Init.
 createListeners();
 
 function createListeners(){
-    // Create grid click listeners (humans move)
+    // Create grid click listeners (humans move).
     for (var i = 0; i < grid.length; i++){
         grid[i].addEventListener("click", function(){
             humanTurn(this);
         })
     }
 
-    // Reset button
+    // Reset button.
     reset.addEventListener("click", function(){
             resetGame();
     })
 
-    // Difficulty
+    // Difficulty.
     for (var i = 0; i < difficulty.length; i++){
         difficulty[i].addEventListener("click", function(){
             difficulty[0].classList.remove("selected");
@@ -47,23 +52,23 @@ function createListeners(){
 }
 
 function resetGame(){
-    // Reset vars
+    // Reset vars.
     currentPlayer = HUMAN;
     depth = 0;
     board = [
-        null, null, null, 
-        null, null, null, 
-        null, null, null
+        EMPTY, EMPTY, EMPTY, 
+        EMPTY, EMPTY, EMPTY, 
+        EMPTY, EMPTY, EMPTY
         ];
     gameOver = false;
 
-    // Remove 'pieces' from board
+    // Remove 'pieces' from board.
     for (var i = 0; i < grid.length; i++){
         grid[i].classList.remove("human");
         grid[i].classList.remove("cpu");
     }
 
-    // Clear end game div
+    // Clear end game div.
     victory.innerHTML = ""
     victory.classList.remove("win");
     victory.classList.remove("loss");
@@ -72,14 +77,14 @@ function resetGame(){
 
 
 function humanTurn(element){
-    // Check for a winner
-    if (getWinner(board) === null) {
-        // If empty piece is clicked
+    // Check for a winner.
+    if (getWinner(board) === EMPTY) {
+        // If empty piece is clicked.
         if (!element.classList.contains("cpu") && !element.classList.contains("human")) {
-            // Make the move
+            // Make the move.
             element.classList.add("human");
             board[Number(element.id)] = currentPlayer;
-            // Check for winner
+            // Check for winner.
             if (getWinner(board) === HUMAN) {
                 victory.innerHTML = "You Win!"
                 victory.classList.add("win");
@@ -87,7 +92,7 @@ function humanTurn(element){
                 victory.innerHTML = "You Draw!"
                 victory.classList.add("draw");
             }
-            // Switch players - make CPU move
+            // Switch players - make CPU move.
             currentPlayer = CPU
             cpuTurn();
        } 
@@ -95,9 +100,9 @@ function humanTurn(element){
 }
 
 function cpuTurn(){
-    // Check for a winner
-    if ( getWinner(board) === null ){
-        // Make the move based on difficulty
+    // Check for a winner.
+    if ( getWinner(board) === EMPTY ){
+        // Make the move based on difficulty.
         var nextMove = getNextCPUMove ();
         board[nextMove] = currentPlayer
         grid[nextMove].classList.add("cpu");
@@ -109,7 +114,7 @@ function cpuTurn(){
             victory.innerHTML = "You Draw!"
             victory.classList.add("draw");
         }
-        // Switch players
+        // Switch players.
         currentPlayer = HUMAN
     } 
 }
@@ -117,25 +122,24 @@ function cpuTurn(){
 function getNextCPUMove (){
     var nextCPUMove;
     if (CPULevel === "potato"){
-        // Get random move from available moves
+        // Get random move from available moves.
         var availableMoves = getAvailableMoves(board);
         nextCPUMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
     } else {
-        // Calculate next move using minimax algorithm
+        // Calculate next move using minimax algorithm.
         var bestMove = getBestMove(board, depth, currentPlayer);
         nextCPUMove = bestMove["move"];
     }
-
     return nextCPUMove
 }
 
 function getBestMove(board, depth, currentPlayer)
 {
-    // Determine winner and increment depth
+    // Determine winner and increment depth.
     var winner = getWinner(board);
     depth += 1;
 
-    // Create required variables
+    // Create required variables.
     var bestMove = {}
     var scores = [];
     var moves = [];
@@ -159,14 +163,14 @@ function getBestMove(board, depth, currentPlayer)
     
     // Get array of moves available
     // if theres no more moves left
-    // then its a tie - return zero
+    // then its a tie - return zero.
     var availableMoves = getAvailableMoves(board);
     if (availableMoves.length === 0) {
         bestMove["score"] = 0;
         return bestMove;
     }
 
-    // Create variables for min and max moves
+    // Create variables for min and max moves.
     var max = {
         score: -100,
         move: 0,
@@ -186,8 +190,9 @@ function getBestMove(board, depth, currentPlayer)
         // Move one step forward and change players.
         board[move] = currentPlayer;
 
-        // Get next players move
-        var nextMove = getBestMove(board, depth, !currentPlayer)
+        // Get next players move.
+        // Bitwise toggle players flags to switch players.
+        var nextMove = getBestMove(board, depth, currentPlayer ^ ANY_PLAYER)
         if (nextMove["score"] > max["score"]){
             max["score"] = nextMove["score"];
             max["move"] = move;
@@ -196,8 +201,7 @@ function getBestMove(board, depth, currentPlayer)
             min["score"] = nextMove["score"];
             min["move"] = move;
         }
-
-        // Undo the move and change player back.
+        // Undo the move.
         board[move] = EMPTY;
 
     })
@@ -208,81 +212,90 @@ function getBestMove(board, depth, currentPlayer)
     } else {
         return min;
     }
-
 }
 
-function getAvailableMoves(game) {
-    // get all available moves on
-    // the current board
+function getAvailableMoves(board) {
+    // Get all available moves on
+    // the current board.
     var possibleMoves = new Array();
-    for (var i = 0; i < game.length; i++){
-        if (game[i] === EMPTY){
+    for (var i = 0; i < board.length; i++){
+        if (board[i] === EMPTY){
             possibleMoves.push(i);
         }
     }
     return possibleMoves;
 }
 
-function getWinner(board)
-{
-    //horizontal victory -
+function getWinner(board){
+    // Use bitwise AND to look for winners. 
+    // Slightly more efficient.
+
+    // Horizontal victory -
     for (var i = 0; i <= 6; i += 3) {
-        //if entire row matches
-        if ((board[i] === board[i + 1]) && (board[i] === board[i + 2])) {   
-            //human wins
-            if (board[i] === HUMAN) {
-                return HUMAN;
-            }
-           //CPU wins
-            else if (board[i] === CPU) {
-               return CPU; 
-            }
+        //if entire row matches.
+        if ((board[i] & HUMAN) 
+            && (board[i + 1] & HUMAN) 
+            && (board[i + 2] & HUMAN)){   
+            // HUMAN wins.
+            return HUMAN;
+        }
+        else if ((board[i] & CPU) 
+            && (board[i + 1] & CPU) 
+            && (board[i + 2] & CPU)){
+            //CPU wins.
+           return CPU; 
         }
     }
-    //vertical victory |
+    // Vertical victory |
     for (var i = 0; i <= 2; i++) {
         // if entire coloumn matches
-        if (board[i] === board[i + 3] && board[i] === board[i + 6]) {
-            //human wins
-            if (board[i] === HUMAN) {
+        if ((board[i] & HUMAN) 
+            && (board[i + 3] & HUMAN) 
+            && (board[i + 6] & HUMAN)){
+                // HUMAN wins.
                 return HUMAN;
             }
-            //CPU wins
-            else if (board[i] === CPU) {
+        else if ((board[i] & CPU) 
+            && (board[i + 3] & CPU) 
+            && (board[i + 6] & CPU)){
+                //CPU wins.
                 return CPU;
             }
         }
-    }
-    //diagonal victory \
-    if (board[0] === board[4] && board[0] === board[8]) {
-        //human wins
-        if (board[0] === HUMAN) {
+    // Diagonal victory \
+    if ((board[0] & HUMAN) 
+        && (board[4] & HUMAN) 
+        && (board[8] & HUMAN)){
+            // HUMAN wins.
             return HUMAN;
         }
-        //CPU wins
-        else if (board[0] === CPU) {
-            return CPU;
-        }
+    else if ((board[0] & CPU) 
+        && (board[4] & CPU) 
+        && (board[8] & CPU)){
+        //CPU wins.
+        return CPU;
     }
-
-    //diagonal victory /
-    if (board[2] === board[4] && board[2] === board[6]) {
-        //human wins
-        if (board[2] === HUMAN) {
+    // Diagonal victory /
+    if ((board[2] & HUMAN) 
+        && (board[4] & HUMAN) 
+        && (board[6] & HUMAN)){
+            // HUMAN wins.
             return HUMAN;
         }
-        //CPU wins
-        else if (board[2] === CPU) {
-            return CPU;
-        }
+    else if ((board[2] & CPU) 
+        && (board[4] & CPU) 
+        && (board[6] & CPU)){
+        //CPU wins.
+        return CPU;
     }
 
-    // if game is ongoing return null
+    // If game is ongoing return.
     for (var i = 0; i < board.length; i++) {
-        if (board[i] === EMPTY)
-            return null;
+        if ((board[i] & ALL) === 0){
+            return EMPTY;
+        }
     }
 
-    // else draw
+    // Else draw.
     return DRAW;
 }
